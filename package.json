@@ -1,0 +1,31 @@
+{
+  "name": "food-donation_be",
+  "version": "1.0.0",
+  "description": "Food Donation Backend :P",
+  "homepage": "https://github.com/Interst3llarYT/food-donation_be#readme",
+  "bugs": {
+    "url": "https://github.com/Interst3llarYT/food-donation_be/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Interst3llarYT/food-donation_be.git"
+  },
+  "license": "ISC",
+  "author": "Krish Gopalak",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@types/node": "^26.0.1",
+    "express": "^5.2.1",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^6.0.3"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6"
+  }
+}
