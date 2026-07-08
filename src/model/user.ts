@@ -1,21 +1,21 @@
 import mongoose from "mongoose";
-import dotenv from "dotenv";
-import { type Response, type Request } from 'express';
 
-  const userSchema = new mongoose.Schema({
-    name: {
-      type: String,
-      required: true,
-    },
-    email: {
-      type: String,
-        required: true,
-        unique: true,
-    },
-    password: {
-      type: String,
-      required: true,
-    },
-    
-  });
-  export default mongoose.model("User", userSchema);
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+});
+
+const User = (mongoose.models.User as mongoose.Model<any>) || mongoose.model("User", userSchema as any);
+
+export default User;
