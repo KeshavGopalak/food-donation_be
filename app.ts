@@ -29,7 +29,7 @@ app.use(cors({
 }));
 
 // 2. CRITICAL PREFLIGHT FIX: Explicitly intercept and approve browser preflight requests
-app.options('*', cors()); 
+app.options('*path', cors()); 
 
 app.use("/api/auth", authRouter);
 app.use("/api/donations", donationRouter);
