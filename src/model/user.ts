@@ -14,6 +14,22 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  role: {
+    type: String,
+    enum: ["user", "volunteer", "admin"],
+    default: "user"
+  },
+  status: {
+    type: String,
+    enum: ["active", "inactive", "pending", "denied"],
+    default: "pending"
+  },
+  verified: {
+    type: Boolean,
+    default: false,
+  }
+}, {
+  timestamps: true
 });
 
 const User = (mongoose.models.User as mongoose.Model<any>) || mongoose.model("User", userSchema as any);

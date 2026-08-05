@@ -4,6 +4,7 @@ import connectDB from "./src/config/mongodb.js";
 import authRouter from "./src/routes/authroutes.js";
 import donationRouter from "./src/routes/donationroutes.js";
 import { verifyToken } from "./src/middleware/auth.js";
+import adminRouter from "./src/routes/adminroutes.js";
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.options('*path', cors());
 
 app.use("/api/auth", authRouter);
 app.use("/api/donations", donationRouter);
+app.use("/api/admin", adminRouter);
 
 app.get('/api/database/ping', (_req, res) => res.json({ message: 'pong' }));
 
