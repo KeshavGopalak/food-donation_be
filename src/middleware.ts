@@ -1,29 +1,23 @@
-// src/middleware.ts
+// Express-compatible middleware for the backend service.
+// This file used to be copied from a Next.js project and imported `next/server.js`,
+// which is not available in the Node/Express backend deployed on Render.
 
-import { NextResponse, type NextRequest } from "next/server.js"
+import type { Request, Response, NextFunction } from "express";
 
+const protectedRoutes = ["/dashboard", "/profile", "/settings"];
 
-// Define which routes require authentication
-const protectedRoutes = ['/dashboard', '/profile', '/settings']
+export function middleware(req: Request, res: Response, next: NextFunction) {
+  const token = req.cookies?.session_token;
+  const pathname = req.originalUrl || req.url || "/";
 
-export function middleware(request: NextRequest) {
-  // Extract token from cookies (adjust the key name to match your auth provider)
-  const token = request.cookies.get('session_token')?.value
-  const { pathname } = request.nextUrl
-
-  // Check if the current route is protected
-  const isProtected = protectedRoutes.some((route) => pathname.startsWith(route))
+  const isProtected = protectedRoutes.some((route) => pathname.startsWith(route));
 
   if (isProtected && !token) {
-    // Redirect unauthenticated users to the login page
-    const loginUrl = new URL('/login', request.url)
-    // Optional: Pass the original path as a query param for post-login redirect
-    loginUrl.searchParams.set('callbackUrl', pathname) 
-    return NextResponse.redirect(loginUrl)
+    return res.redirect("/login");
   }
 
-  return NextResponse.next()
+  return next();
 }
 
-// Optimize middleware execution by filtering out static assets
+export default middleware;
 
