@@ -136,3 +136,12 @@ export const searchDonationsByType = async (req: Request, res: Response): Promis
     res.status(500).json({ message: "Error searching donations", error: error.message });
   }
 };
+
+export const getDonationCount = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const count = await Donation.countDocuments();
+    res.status(200).json({ count });
+  } catch (error: any) {
+    res.status(500).json({ message: "Error fetching donation count", error: error.message });
+  }
+};

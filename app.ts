@@ -1,15 +1,16 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import connectDB from "./src/config/mongodb.js";
 import authRouter from "./src/routes/authroutes.js";
 import donationRouter from "./src/routes/donationroutes.js";
-import { verifyToken } from "./src/middleware/auth.js";
 import adminRouter from "./src/routes/adminroutes.js";
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // 1. FIXED SLASHE: Removed the trailing slash at the end of the URL string
 const allowedOrigins = [

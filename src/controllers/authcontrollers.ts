@@ -3,6 +3,27 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../model/user.js";
 
+const JWT_SECRET = process.env.JWT_SECRET || "dev-secret";
+const COOKIE_MAX_AGE = 1000 * 60 * 60 * 24 * 7;
+
+const setSessionCookie = (res: Response, sessionToken: string) => {
+  res.cookie("session_token", sessionToken, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: COOKIE_MAX_AGE,
+  });
+
+  res.cookie("session_id", sessionToken, {
+    httpOnly: false,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: COOKIE_MAX_AGE,
+  });
+};
+
 export const registerAuth = async (req: Request, res: Response) => {
   try {
     const { name, email, password, role, status, verified } = req.body as {
@@ -46,10 +67,17 @@ export const registerAuth = async (req: Request, res: Response) => {
       verified: verified ?? false,
     });
     const userObj = user.toObject();
-    // remove password before sending
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     delete (userObj as any).password;
-    return res.status(201).json({ user: userObj });
+
+    const sessionToken = jwt.sign(
+      { id: user._id.toString(), email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    setSessionCookie(res, sessionToken);
+    return res.status(201).json({ user: userObj, token: sessionToken });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Server error" });
@@ -69,11 +97,24 @@ export const loginAuth = async (req: Request, res: Response) => {
 
     const userObj = user.toObject();
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    // delete (userObj as any).password;
-    // const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || "dev-secret", { expiresIn: "7d" });
-    return res.status(200).json({ user: userObj });
+    delete (userObj as any).password;
+
+    const sessionToken = jwt.sign(
+      { id: user._id.toString(), email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    setSessionCookie(res, sessionToken);
+    return res.status(200).json({ user: userObj, token: sessionToken });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Server error" });
   }
+};
+
+export const logoutAuth = async (_req: Request, res: Response) => {
+  res.clearCookie("session_token", { path: "/" });
+  res.clearCookie("session_id", { path: "/" });
+  return res.status(200).json({ message: "Logged out" });
 };

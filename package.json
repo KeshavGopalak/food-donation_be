@@ -20,9 +20,11 @@
     "start": "concurrently \"tsc -w\" \"nodemon dist/app.js\""
   },
   "dependencies": {
+    "@types/cookie-parser": "^1.4.10",
     "@types/node": "^26.0.1",
     "bcryptjs": "^2.4.3",
     "concurrently": "^10.0.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
