@@ -7,18 +7,20 @@ const JWT_SECRET = process.env.JWT_SECRET || "dev-secret";
 const COOKIE_MAX_AGE = 1000 * 60 * 60 * 24 * 7;
 
 const setSessionCookie = (res: Response, sessionToken: string) => {
+  const isProduction = process.env.NODE_ENV === "production";
+
   res.cookie("session_token", sessionToken, {
     httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    sameSite: isProduction ? "none" : "lax",
+    secure: isProduction,
     path: "/",
     maxAge: COOKIE_MAX_AGE,
   });
 
   res.cookie("session_id", sessionToken, {
     httpOnly: false,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    sameSite: isProduction ? "none" : "lax",
+    secure: isProduction,
     path: "/",
     maxAge: COOKIE_MAX_AGE,
   });
