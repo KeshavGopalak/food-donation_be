@@ -74,7 +74,7 @@ export const updateDonationStatus = async (req: Request, res: Response): Promise
     const { id } = req.params;
     const { status } = req.body;
 
-    if (!["Available", "Pending Pickup", "Completed", "Expired"].includes(status)) {
+    if (typeof status !== "string" || !["Available", "Pending Pickup", "Completed", "Expired"].includes(status)) {
       return res.status(400).json({ message: "Invalid status" });
     }
 
@@ -130,6 +130,23 @@ export const searchDonationsByType = async (req: Request, res: Response): Promis
     }
 
     const donations = await Donation.find({ foodType, status: "Available" }).sort({ createdAt: -1 });
+
+    res.status(200).json({ donations });
+  } catch (error: any) {
+    res.status(500).json({ message: "Error searching donations", error: error.message });
+  }
+};
+
+// Search donations by status
+export const searchDonationsByStatus = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { status } = req.params;
+
+    if (typeof status !== "string" || !["Available", "Pending Pickup", "Completed", "Expired"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+
+    const donations = await Donation.find({ status }).sort({ createdAt: -1 });
 
     res.status(200).json({ donations });
   } catch (error: any) {

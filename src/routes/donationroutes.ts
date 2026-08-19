@@ -1,5 +1,5 @@
 import express from "express";
-import { createDonation, getAllDonations, getDonationById, getDonationsByDonor, updateDonationStatus, deleteDonation, getNearbySharedFood, searchDonationsByType, getDonationCount } from "../controllers/donationcontroller.js";
+import { createDonation, getAllDonations, getDonationById, getDonationsByDonor, updateDonationStatus, deleteDonation, getNearbySharedFood, searchDonationsByType, getDonationCount, searchDonationsByStatus } from "../controllers/donationcontroller.js";
 import { requireAuth } from "../middleware/auth.js";
 
 
@@ -16,6 +16,9 @@ router.get("/nearby", getNearbySharedFood);
 
 // Search donations by food type
 router.get("/search", searchDonationsByType);
+
+// Search donations by status
+router.get("/search/status/:status", searchDonationsByStatus);
 
 // Get donations by donor ID
 router.get("/donor/:donorId", getDonationsByDonor);

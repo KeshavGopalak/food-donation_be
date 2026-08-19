@@ -5,10 +5,12 @@ import connectDB from "./src/config/mongodb.js";
 import authRouter from "./src/routes/authroutes.js";
 import donationRouter from "./src/routes/donationroutes.js";
 import adminRouter from "./src/routes/adminroutes.js";
+import dbrouter from "./src/routes/dbroutes.js";
+import path from "node:path";
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
@@ -36,6 +38,8 @@ app.options('*path', cors());
 app.use("/api/auth", authRouter);
 app.use("/api/donations", donationRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api/dashboard", dbrouter)
+app.use("/uploads", express.static(path.resolve("uploads")));
 
 app.get('/api/database/ping', (_req, res) => res.json({ message: 'pong' }));
 
