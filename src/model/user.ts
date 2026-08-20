@@ -31,6 +31,12 @@ const userSchema = new mongoose.Schema({
   verified: {
     type: Boolean,
     default: false,
+  },
+  volunteerDetails: {
+    experience: { type: String, default: "" },
+    availability: { type: String, default: "" },
+    skills: { type: String, default: "" },
+    transportation: { type: String, default: "" },
   }
 }, {
   timestamps: true

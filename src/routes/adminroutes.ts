@@ -1,11 +1,12 @@
 import express from "express";
-import { getAllUsers, updateUser } from "../controllers/admincontrollers.js";
-import { requireAuth } from "../middleware/auth.js";
+import { createUser, getAllUsers, updateUser } from "../controllers/admincontrollers.js";
+import { requireAuth, requireRole } from "../middleware/auth.js";
 
 
 const adminRouter = express.Router();
 
-adminRouter.get("/users", requireAuth, getAllUsers);
-adminRouter.patch("/users/:id", requireAuth, updateUser);
+adminRouter.get("/users", requireAuth, requireRole("admin"), getAllUsers);
+adminRouter.post("/users", requireAuth, requireRole("admin"), createUser);
+adminRouter.patch("/users/:id", requireAuth, requireRole("admin"), updateUser);
 
 export default adminRouter;

@@ -31,13 +31,17 @@ const setSessionCookie = (res: Response, sessionToken: string) => {
 
 export const registerAuth = async (req: Request, res: Response) => {
   try {
-    const { name, email, password, role, status, verified } = req.body as {
+    const { name, email, password, role, volunteerDetails } = req.body as {
       name?: string;
       email?: string;
       password?: string;
       role?: string;
-      status?: string;
-      verified?: boolean;
+      volunteerDetails?: {
+        experience?: string;
+        availability?: string;
+        skills?: string;
+        transportation?: string;
+      };
     };
 
     if (!name || !email || !password) {
@@ -48,18 +52,9 @@ export const registerAuth = async (req: Request, res: Response) => {
     if (existing) return res.status(409).json({ message: "User already exists" });
 
     const allowedRoles = ["user", "volunteer", "admin"];
-    const allowedStatuses = ["active", "inactive", "pending", "denied"];
-
-    if (role && !allowedRoles.includes(role.toLowerCase())) {
+    const normalizedRole = role?.toLowerCase() || "user";
+    if (!allowedRoles.includes(normalizedRole) || normalizedRole === "admin") {
       return res.status(400).json({ message: "Invalid role" });
-    }
-
-    if (status && !allowedStatuses.includes(status.toLowerCase())) {
-      return res.status(400).json({ message: "Invalid status" });
-    }
-
-    if (verified != null && typeof verified !== "boolean") {
-      return res.status(400).json({ message: "Invalid verified value" });
     }
 
     const hashed = await bcrypt.hash(password, 10);
@@ -67,13 +62,21 @@ export const registerAuth = async (req: Request, res: Response) => {
       name,
       email,
       password: hashed,
-      role: role ? role.toLowerCase() : undefined,
-      status: status ? status.toLowerCase() : undefined,
-      verified: verified ?? false,
+      role: normalizedRole,
+      status: normalizedRole === "volunteer" ? "pending" : "active",
+      verified: normalizedRole !== "volunteer",
+      volunteerDetails: normalizedRole === "volunteer" ? volunteerDetails : undefined,
     });
     const userObj = user.toObject();
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     delete (userObj as any).password;
+
+    if (normalizedRole === "volunteer") {
+      return res.status(201).json({
+        message: "Volunteer application submitted for approval",
+        user: userObj,
+      });
+    }
 
     const sessionToken = jwt.sign(
       { id: user._id.toString(), email: user.email, role: user.role },
@@ -99,6 +102,9 @@ export const loginAuth = async (req: Request, res: Response) => {
 
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ message: "Invalid credentials" });
+    if ((user.status === "pending" || user.status === "denied") && user.role !== "admin") {
+      return res.status(403).json({ message: user.role === "volunteer" ? "Your volunteer account is awaiting approval" : "Your account is inactive" });
+    }
 
     const userObj = user.toObject();
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
